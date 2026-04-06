@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MES — Mapa do Estado do Sistema Nervoso | YogIN® Academy</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green-dark:   #02732a;
+    --green-mid:    #04bf9d;
+    --green-light:  #04bf8a;
+    --green-pale:   #d8f2e8;
+    --green-bg:     #f0fdf8;
+    --white:        #ffffff;
+    --text-primary: #1a1a1a;
+    --text-secondary: #555555;
+    --text-tertiary: #888888;
+    --border:       #e2ecef;
+    --red:    #C0392B;
+    --orange: #E67E22;
+    --yellow: #F1C40F;
+  }
+
+  body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: #f8fdf9;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem 4rem;
+    color: var(--text-primary);
+  }
+
+  .mes-container {
+    width: 100%;
+    max-width: 580px;
+  }
+
+  .mes-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--green-pale);
+  }
+
+  .logo-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--green-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .logo-mark svg { width: 24px; height: 24px; }
+
+  .header-text .brand {
+    font-family: 'Georgia', serif;
+    font-size: 13px;
+    font-weight: normal;
+    color: var(--green-dark);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .header-text .instrument-name {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    letter-spacing: 0.04em;
+    margin-top: 2px;
+    font-family: 'Georgia', serif;
+  }
+
+  .progress-bar {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 2.5rem;
+  }
+
+  .progress-dot {
+    height: 3px;
+    flex: 1;
+    border-radius: 2px;
+    background: var(--green-pale);
+    transition: background 0.4s ease;
+  }
+
+  .progress-dot.done    { background: var(--green-mid); }
+  .progress-dot.current { background: var(--green-mid); opacity: 0.45; }
+
+  .step { display: none; }
+  .step.active { display: block; animation: fadeUp 0.3s ease; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-label {
+    font-size: 11px;
+    color: var(--green-mid);
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+    font-family: 'Georgia', serif;
+  }
+
+  .step-question {
+    font-size: 22px;
+    font-weight: normal;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    font-family: 'Georgia', serif;
+  }
+
+  .step-sub {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 2.5rem;
+    line-height: 1.65;
+    font-family: 'Georgia', serif;
+  }
+
+  .slider-wrap { margin: 1.5rem 0 2.5rem; }
+
+  .slider-anchors {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .anchor {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    max-width: 44%;
+    line-height: 1.35;
+    font-family: 'Georgia', serif;
+    font-style: italic;
+  }
+
+  .anchor.right { text-align: right; }
+
+  .gradient-track {
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(to right, #C0392B, #E67E22, #F1C40F, #04bf9d);
+    margin-bottom: -8px;
+  }
+
+  input[type=range] {
+    width: 100%;
+    height: 8px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
+    display: block;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 2.5px solid var(--green-dark);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(2,115,42,0.18);
+    transition: box-shadow 0.2s;
+  }
+
+  input[type=range]::-webkit-slider-thumb:hover {
+    box-shadow: 0 2px 10px rgba(2,115,42,0.3);
+  }
+
+  input[type=range]::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 2.5px solid var(--green-dark);
+    cursor: pointer;
+  }
+
+  .tick-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding: 0 2px;
+  }
+
+  .tick {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    width: 18px;
+    text-align: center;
+    font-family: 'Georgia', serif;
+  }
+
+  .slider-value {
+    text-align: center;
+    font-size: 42px;
+    font-weight: normal;
+    color: var(--green-dark);
+    margin-top: 1.25rem;
+    font-family: 'Georgia', serif;
+    line-height: 1;
+  }
+
+  .radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 2.5rem;
+  }
+
+  .radio-option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 15px 18px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    background: var(--white);
+  }
+
+  .radio-option:hover {
+    border-color: var(--green-mid);
+    background: var(--green-bg);
+  }
+
+  .radio-option.selected {
+    border-color: var(--green-dark);
+    background: var(--green-bg);
+  }
+
+  .radio-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid #cccccc;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .radio-option.selected .radio-dot {
+    border-color: var(--green-dark);
+    background: var(--green-dark);
+  }
+
+  .radio-option.selected .radio-dot::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+    display: block;
+  }
+
+  .radio-label {
+    font-size: 15px;
+    color: var(--text-primary);
+    font-family: 'Georgia', serif;
+  }
+
+  .radio-option.selected .radio-label { color: var(--green-dark); }
+
+  .radio-sub {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-top: 3px;
+    font-family: 'Georgia', serif;
+    font-style: italic;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 0.5rem;
+  }
+
+  .btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    border: 1px solid #cccccc;
+    background: var(--white);
+    color: var(--text-primary);
+    transition: background 0.2s, border-color 0.2s;
+    font-family: 'Georgia', serif;
+  }
+
+  .btn:hover { background: #f5f5f5; }
+
+  .btn-primary {
+    background: var(--green-dark);
+    color: white;
+    border-color: var(--green-dark);
+  }
+
+  .btn-primary:hover { background: #025a20; border-color: #025a20; }
+
+  .btn-primary:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  /* RESULT */
+  .result-card {
+    background: var(--white);
+    border: 1px solid var(--green-pale);
+    border-top: 3px solid var(--green-mid);
+    border-radius: 12px;
+    padding: 1.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .result-tag {
+    display: inline-block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 5px 12px;
+    border-radius: 20px;
+    margin-bottom: 1.25rem;
+    font-family: 'Georgia', serif;
+  }
+
+  .result-title {
+    font-size: 20px;
+    font-weight: normal;
+    color: var(--text-primary);
+    margin-bottom: 0.85rem;
+    line-height: 1.45;
+    font-family: 'Georgia', serif;
+  }
+
+  .result-body {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    font-family: 'Georgia', serif;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--green-pale);
+    margin: 1.25rem 0;
+  }
+
+  .result-practice-label {
+    font-size: 11px;
+    color: var(--green-mid);
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    margin-bottom: 5px;
+    font-family: 'Georgia', serif;
+  }
+
+  .result-practice-name {
+    font-size: 18px;
+    color: var(--green-dark);
+    font-family: 'Georgia', serif;
+  }
+
+  .dimensions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 1.25rem;
+  }
+
+  .dim-card {
+    background: var(--green-bg);
+    border: 1px solid var(--green-pale);
+    border-radius: 10px;
+    padding: 14px;
+  }
+
+  .dim-name {
+    font-size: 11px;
+    color: var(--green-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 9px;
+    font-family: 'Georgia', serif;
+  }
+
+  .dim-bar-bg {
+    height: 5px;
+    border-radius: 3px;
+    background: var(--green-pale);
+    overflow: hidden;
+    margin-bottom: 7px;
+  }
+
+  .dim-bar-fill { height: 100%; border-radius: 3px; }
+
+  .dim-val {
+    font-size: 13px;
+    color: var(--text-primary);
+    font-family: 'Georgia', serif;
+  }
+
+  .mes-footer {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--green-pale);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .restart-btn {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+    font-family: 'Georgia', serif;
+    font-style: italic;
+  }
+
+  .mes-brand {
+    font-size: 12px;
+    color: var(--green-mid);
+    letter-spacing: 0.06em;
+    font-family: 'Georgia', serif;
+  }
+
+  .disclaimer {
+    margin-top: 2rem;
+    padding: 1rem 1.25rem;
+    background: var(--green-bg);
+    border-radius: 8px;
+    border-left: 3px solid var(--green-pale);
+  }
+
+  .disclaimer p {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    line-height: 1.65;
+    font-family: 'Georgia', serif;
+    font-style: italic;
+  }
+
+  @media (max-width: 480px) {
+    .step-question { font-size: 19px; }
+    .slider-value { font-size: 36px; }
+    .dimensions-grid { grid-template-columns: 1fr; }
+    body { padding: 1.5rem 1rem 3rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mes-container">
+
+  <div class="mes-header">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" stroke="white" stroke-width="1.5"/>
+        <path d="M12 5 C12 5 7.5 9 7.5 13 C7.5 15.5 9.5 17.5 12 17.5 C14.5 17.5 16.5 15.5 16.5 13 C16.5 9 12 5 12 5Z" fill="white" opacity="0.85"/>
+        <line x1="12" y1="11" x2="12" y2="15.5" stroke="#02732a" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="header-text">
+      <div class="brand">MES · YogIN® Academy</div>
+      <div class="instrument-name">Mapa do Estado do Sistema Nervoso</div>
+    </div>
+  </div>
+
+  <div class="progress-bar" id="progressBar">
+    <div class="progress-dot" id="d0"></div>
+    <div class="progress-dot" id="d1"></div>
+    <div class="progress-dot" id="d2"></div>
+    <div class="progress-dot" id="d3"></div>
+    <div class="progress-dot" id="d4"></div>
+    <div class="progress-dot" id="d5"></div>
+  </div>
+
+  <!-- STEP 0 -->
+  <div class="step active" id="step0">
+    <p class="step-label">Estado atual — 1 de 4</p>
+    <p class="step-question">Como está seu nível de tensão ou agitação agora?</p>
+    <p class="step-sub">Pense em como você está neste momento — não como costuma ser.</p>
+    <div class="slider-wrap">
+      <div class="slider-anchors">
+        <span class="anchor">Muito tenso ou agitado, difícil de parar</span>
+        <span class="anchor right">Calmo, estável, disponível</span>
+      </div>
+      <div class="gradient-track"></div>
+      <input type="range" min="0" max="10" step="1" value="5" id="s0" oninput="updateSlider(0,this.value)">
+      <div class="tick-row" id="ticks0"></div>
+      <div class="slider-value" id="sv0">5</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="next(0)">Próximo</button>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step" id="step1">
+    <p class="step-label">Estado atual — 2 de 4</p>
+    <p class="step-question">Como está sua energia e disposição agora?</p>
+    <p class="step-sub">Considere seu corpo — peso, vitalidade, vontade de agir.</p>
+    <div class="slider-wrap">
+      <div class="slider-anchors">
+        <span class="anchor">Sem energia, corpo pesado, esgotado</span>
+        <span class="anchor right">Com energia, disposto, pronto para agir</span>
+      </div>
+      <div class="gradient-track"></div>
+      <input type="range" min="0" max="10" step="1" value="5" id="s1" oninput="updateSlider(1,this.value)">
+      <div class="tick-row" id="ticks1"></div>
+      <div class="slider-value" id="sv1">5</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="back(1)">Voltar</button>
+      <button class="btn btn-primary" onclick="next(1)">Próximo</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step" id="step2">
+    <p class="step-label">Estado atual — 3 de 4</p>
+    <p class="step-question">Como está sua sensação de estabilidade interna agora?</p>
+    <p class="step-sub">Oscilando, difícil de se situar — ou presente e centrado?</p>
+    <div class="slider-wrap">
+      <div class="slider-anchors">
+        <span class="anchor">Oscilando, estado flutuante, difícil de me situar</span>
+        <span class="anchor right">Estável, presente, centrado</span>
+      </div>
+      <div class="gradient-track"></div>
+      <input type="range" min="0" max="10" step="1" value="5" id="s2" oninput="updateSlider(2,this.value)">
+      <div class="tick-row" id="ticks2"></div>
+      <div class="slider-value" id="sv2">5</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="back(2)">Voltar</button>
+      <button class="btn btn-primary" onclick="next(2)">Próximo</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step" id="step3">
+    <p class="step-label">Estado atual — 4 de 4</p>
+    <p class="step-question">Como está sua respiração neste momento?</p>
+    <p class="step-sub">Observe como o ar está entrando e saindo agora.</p>
+    <div class="slider-wrap">
+      <div class="slider-anchors">
+        <span class="anchor">Acelerada, curta ou desconfortável</span>
+        <span class="anchor right">Lenta, fácil, confortável</span>
+      </div>
+      <div class="gradient-track"></div>
+      <input type="range" min="0" max="10" step="1" value="5" id="s3" oninput="updateSlider(3,this.value)">
+      <div class="tick-row" id="ticks3"></div>
+      <div class="slider-value" id="sv3">5</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="back(3)">Voltar</button>
+      <button class="btn btn-primary" onclick="next(3)">Próximo</button>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step" id="step4">
+    <p class="step-label">Contexto — 1 de 2</p>
+    <p class="step-question">Como foi sua última noite de sono?</p>
+    <p class="step-sub">Não precisa ser preciso — uma impressão geral é suficiente.</p>
+    <div class="radio-group" id="rg4">
+      <div class="radio-option" onclick="selectRadio(4,0)">
+        <div class="radio-dot"></div>
+        <div><div class="radio-label">Ruim</div><div class="radio-sub">Acordei cansado ou dormi pouco</div></div>
+      </div>
+      <div class="radio-option" onclick="selectRadio(4,1)">
+        <div class="radio-dot"></div>
+        <div><div class="radio-label">Regular</div><div class="radio-sub">Dormiu, mas não restaurou bem</div></div>
+      </div>
+      <div class="radio-option" onclick="selectRadio(4,2)">
+        <div class="radio-dot"></div>
+        <div><div class="radio-label">Boa</div><div class="radio-sub">Acordei descansado</div></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="back(4)">Voltar</button>
+      <button class="btn btn-primary" id="btn4" disabled onclick="next(4)">Próximo</button>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step" id="step5">
+    <p class="step-label">Contexto — 2 de 2</p>
+    <p class="step-question">Como foi sua carga nos últimos 2 a 3 dias?</p>
+    <p class="step-sub">Carga inclui trabalho, demandas, conflitos, viagens, esforço físico.</p>
+    <div class="radio-group" id="rg5">
+      <div class="radio-option" onclick="selectRadio(5,0)">
+        <div class="radio-dot"></div>
+        <div><div class="radio-label">Alta</div><div class="radio-sub">Muita demanda, pouco descanso</div></div>
+      </div>
+      <div class="radio-option" onclick="selectRadio(5,1)">
+        <div class="radio-dot"></div>
+        <div><div class="radio-label">Moderada</div><div class="radio-sub">Ritmo normal</div></div>
+      </div>
+      <div class="radio-option" onclick="selectRadio(5,2)">
+        <div class="radio-dot"></div>
+        <div><div class="radio-label">Baixa</div><div class="radio-sub">Tranquilo, sem muita exigência</div></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="back(5)">Voltar</button>
+      <button class="btn btn-primary" id="btn5" disabled onclick="showResult()">Ver meu estado</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="step" id="stepResult">
+    <p class="step-label">Seu resultado</p>
+    <div id="resultContent"></div>
+    <div class="disclaimer">
+      <p>O MES não é um diagnóstico. É uma bússola de orientação. Ele identifica como o sistema nervoso está funcionando agora e aponta qual prática faz mais sentido aplicar neste momento. Seu uso é opcional — você pode escolher a prática diretamente se preferir.</p>
+    </div>
+    <div class="mes-footer">
+      <button class="restart-btn" onclick="restart()">Refazer o MES</button>
+      <span class="mes-brand">YogIN® Academy</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var vals = [5,5,5,5,-1,-1];
+
+function buildTicks(){
+  for(var i=0;i<4;i++){
+    var row=document.getElementById('ticks'+i), html='';
+    for(var n=0;n<=10;n++) html+='<span class="tick">'+n+'</span>';
+    row.innerHTML=html;
+  }
+}
+
+function updateSlider(i,v){
+  vals[i]=parseInt(v);
+  document.getElementById('sv'+i).textContent=v;
+}
+
+function selectRadio(step,val){
+  vals[step]=val;
+  var opts=document.getElementById('rg'+step).querySelectorAll('.radio-option');
+  opts.forEach(function(o){ o.classList.remove('selected'); });
+  opts[val].classList.add('selected');
+  document.getElementById('btn'+step).disabled=false;
+}
+
+function showStep(n){
+  document.querySelectorAll('.step').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(n<6?'step'+n:'stepResult').classList.add('active');
+  for(var i=0;i<6;i++){
+    var d=document.getElementById('d'+i);
+    d.className='progress-dot'+(i<n?' done':i===n?' current':'');
+  }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function next(n){ showStep(n+1); }
+function back(n){ showStep(n-1); }
+
+function restart(){
+  vals=[5,5,5,5,-1,-1];
+  for(var i=0;i<4;i++){
+    document.getElementById('s'+i).value=5;
+    document.getElementById('sv'+i).textContent='5';
+  }
+  ['rg4','rg5'].forEach(function(id){
+    document.getElementById(id).querySelectorAll('.radio-option').forEach(function(o){ o.classList.remove('selected'); });
+  });
+  document.getElementById('btn4').disabled=true;
+  document.getElementById('btn5').disabled=true;
+  showStep(0);
+}
+
+function getBarColor(v){
+  if(v<=3) return '#C0392B';
+  if(v<=5) return '#E67E22';
+  if(v<=7) return '#F1C40F';
+  return '#04bf9d';
+}
+
+function calcResult(){
+  var p1=vals[0],p2=vals[1],p3=vals[2],p4=vals[3],sono=vals[4],carga=vals[5];
+  if([p1,p2,p3,p4].every(function(v){ return v>=6; })) return 'equilibrado';
+  var minV=Math.min(p1,p2,p3,p4),dims=[];
+  if(p1===minV) dims.push('a');
+  if(p2===minV) dims.push('e');
+  if(p3===minV) dims.push('s');
+  if(p4===minV) dims.push('r');
+  if(dims.indexOf('a')>=0) return 'desaceleracao';
+  if(dims.indexOf('s')>=0) return 'estabilizacao';
+  if(dims.indexOf('e')>=0) return (sono===0||carga===0)?'restauracao':'ativacao';
+  if(dims.indexOf('r')>=0){
+    var o=Math.min(p1,p2,p3);
+    if(p1===o) return 'desaceleracao';
+    if(p3===o) return 'estabilizacao';
+    return (sono===0||carga===0)?'restauracao':'ativacao';
+  }
+  return 'estabilizacao';
+}
+
+var R={
+  desaceleracao:{
+    tag:'Ativação elevada', tc:'#fff3ee', tt:'#8a3520',
+    title:'Seu sistema nervoso está em modo de maior ativação.',
+    body:'Tensão, agitação ou respiração curta indicam predominância simpática elevada. Não é fraqueza — é fisiologia. A Prática de Desaceleração usa respiração lenta e movimentos de baixa intensidade para reduzir essa ativação e permitir que o sistema nervoso se recupere.',
+    practice:'Prática de Desaceleração',
+    sub:'— para reduzir tensão e agitação'
+  },
+  restauracao:{
+    tag:'Esgotamento acumulado', tc:'#fffbf0', tt:'#7a4a08',
+    title:'Seu sistema nervoso está pedindo recuperação profunda.',
+    body:'Baixa energia combinada com sono ruim ou carga alta é sinal de esgotamento acumulado. Não é falta de motivação — é um estado fisiológico real. A Prática de Restauração cria as condições para que o sistema nervoso se reorganize sem ser exigido.',
+    practice:'Prática de Restauração',
+    sub:'— para recuperação profunda'
+  },
+  ativacao:{
+    tag:'Baixa responsividade', tc:'#f0fdf8', tt:'#025a20',
+    title:'Seu sistema nervoso está em baixa responsividade.',
+    body:'Corpo pesado e pouca energia sem sinal de esgotamento indicam baixa ativação funcional. A Prática de Ativação Regulada aumenta o engajamento fisiológico de forma organizada — sem agitar, sem forçar.',
+    practice:'Prática de Ativação Regulada',
+    sub:'— para retomar energia e disposição'
+  },
+  estabilizacao:{
+    tag:'Oscilação interna', tc:'#f0f8ff', tt:'#1a4a7a',
+    title:'Seu sistema nervoso está oscilando.',
+    body:'Dificuldade de se situar, sensação de estado flutuante ou alternância entre agitação e cansaço indicam baixa coerência interna. A Prática de Estabilização usa sequências regulares e respiração cadenciada para organizar esse ritmo.',
+    practice:'Prática de Estabilização',
+    sub:'— para organizar oscilação interna'
+  },
+  equilibrado:{
+    tag:'Estado equilibrado', tc:'#f0fdf8', tt:'#02732a',
+    title:'Seu sistema nervoso está relativamente equilibrado agora.',
+    body:'Não há um sinal dominante de desregulação. Uma boa escolha é a Prática de Estabilização para manter esse estado — ou você pode escolher livremente com base no que sentir.',
+    practice:'Prática de Estabilização',
+    sub:'— ou escolha livre'
+  }
+};
+
+var dimNames=['Ativação / Tensão','Energia','Estabilidade','Respiração'];
+
+function showResult(){
+  var key=calcResult(),r=R[key];
+  var html='<div class="result-card">';
+  html+='<span class="result-tag" style="background:'+r.tc+';color:'+r.tt+'">'+r.tag+'</span>';
+  html+='<p class="result-title">'+r.title+'</p>';
+  html+='<p class="result-body">'+r.body+'</p>';
+  html+='<div class="divider"></div>';
+  html+='<p class="result-practice-label">Prática indicada</p>';
+  html+='<p class="result-practice-name">'+r.practice+' <span style="font-style:italic;color:#888;font-size:15px;">'+r.sub+'</span></p>';
+  html+='</div>';
+  html+='<div class="dimensions-grid">';
+  for(var i=0;i<4;i++){
+    var v=vals[i];
+    html+='<div class="dim-card">';
+    html+='<div class="dim-name">'+dimNames[i]+'</div>';
+    html+='<div class="dim-bar-bg"><div class="dim-bar-fill" style="width:'+Math.round(v*10)+'%;background:'+getBarColor(v)+'"></div></div>';
+    html+='<div class="dim-val">'+v+' / 10</div>';
+    html+='</div>';
+  }
+  html+='</div>';
+  document.getElementById('resultContent').innerHTML=html;
+  showStep(6);
+}
+
+buildTicks();
+showStep(0);
+</script>
+</body>
+</html>
